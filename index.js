@@ -3,7 +3,7 @@ const bodyParser = require('body-parser')
 const app = express()
 const axios = require('axios')
 app.use(bodyParser.json())
-app.set('port', (process.env.PORT || 5000))
+app.set('port', (process.env.PORT || 80))
 
 const REQUIRE_AUTH = false
 const AUTH_TOKEN = 'an-example-token'
@@ -20,18 +20,71 @@ app.post('/webhook', function (req, res) {
   // the payload is stored on req.body
   console.log(req.body)
 
-  // we have a simple authentication
-  if (REQUIRE_AUTH) {
-    if (req.headers['auth-token'] !== AUTH_TOKEN) {
-      return res.status(401).send('Unauthorized')
-    }
+  /*
+  if(req.body.result.action == 'welcome'){
+    axios.get(
+           'https://dev23543.service-now.com/api/203134/ams/getinicidentlist'
+    ).then((data)=>{
+           console.log("Your Data",data)
+           res.status(200).json({
+             source: 'Merlin',
+             speech: 'Hi! Tickets: ' + JSON.stringify(data.data),
+             displayText: 'webhookReply'
+           })
+    }).catch((e)=>{
+           console.log("error",e.toString());
+    });
+  }*/
+
+  switch(req.body.result.action){
+    case 'welcome':
+      axios.get(
+           'https://dev23543.service-now.com/api/203134/ams/getinicidentlist'
+    ).then((data)=>{
+           console.log("Your Data",data)
+           res.status(200).json({
+             source: 'Merlin',
+             speech: 'Hi! Tickets: ' + JSON.stringify(data.data),
+             displayText: 'webhookReply'
+           })
+    }).catch((e)=>{
+           console.log("error",e.toString());
+    });
+    break;
+
+    case 'check-tickets-request':
+    console.log("Check tickets")
+           res.status(200).json({
+             source: 'Merlin',
+             speech: 'Check tickets',
+             displayText: 'webhookReply'
+           })
+    break;
+
+    case 'create-ticket':
+    console.log("Crear tickets")
+           res.status(200).json({
+             source: 'Merlin',
+             speech: 'Crear tickets',
+             displayText: 'webhookReply'
+           })
+    break;
+
+
   }
 
-  res.status(200).json({
-    source: 'Merlin',
-    speech: 'BODY: ' + req.body,
-    displayText: 'webhookReply'
-  })
+  // we have a simple authentication
+  //if (REQUIRE_AUTH) {
+  //  if (req.headers['auth-token'] !== AUTH_TOKEN) {
+  //    return res.status(401).send('Unauthorized')
+  //  }
+  //}
+
+  //res.status(200).json({
+  //  source: 'Merlin',
+  //  speech: 'BODY: ' + JSON.stringify(req.body),
+  //  displayText: 'webhookReply'
+  //})
 
   /*axios.get(
       'https://dev23543.service-now.com/api/203134/ams/getinicidentlist'
@@ -48,18 +101,11 @@ app.post('/webhook', function (req, res) {
   }
 
   // the value of Action from api.ai is stored in req.body.result.action
-  console.log('* Received action -- %s', req.body.result.action)
+  //console.log('* Received action -- %s', req.body.result.action)
 
   // parameters are stored in req.body.result.parameters
-  var userName = req.body.result.parameters['given-name']
-  var webhookReply = 'Hello ' + userName + '! Welcome from the webhook.'
-
-  // the most basic response
-  res.status(200).json({
-    source: 'webhook',
-    speech: webhookReply,
-    displayText: webhookReply
-  })
+  //var userName = req.body.result.parameters['given-name']
+  //var webhookReply = 'Hello ' + userName + '! Welcome from the webhook.'
 })
 
 app.listen(app.get('port'), function () {
