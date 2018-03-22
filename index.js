@@ -1,6 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
+const axios = require('axios')
 app.use(bodyParser.json())
 app.set('port', (process.env.PORT || 5000))
 
@@ -25,6 +26,21 @@ app.post('/webhook', function (req, res) {
       return res.status(401).send('Unauthorized')
     }
   }
+
+  res.status(200).json({
+    source: 'Merlin',
+    speech: 'BODY: ' + req.body,
+    displayText: 'webhookReply'
+  })
+
+  /*axios.get(
+      'https://dev23543.service-now.com/api/203134/ams/getinicidentlist'
+   ).then((data)=>{
+          console.log("Your Data",data);
+          res.send('Your data: ' + data);
+   }).catch((e)=>{
+          console.log("error",e.toString());
+   });*/
 
   // and some validation too
   if (!req.body || !req.body.result || !req.body.result.parameters) {
